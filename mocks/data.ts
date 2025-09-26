@@ -1,0 +1,100 @@
+import { CreditCard, Payment, Reward } from '@/types/card';
+
+export const mockCards: CreditCard[] = [
+  {
+    id: '1',
+    bankName: 'Chase Sapphire',
+    cardNumber: '4532',
+    cardHolder: 'Venkat Reddy',
+    dueDate: '2025-01-25',
+    outstandingAmount: 2845.50,
+    minimumDue: 142.25,
+    creditLimit: 15000,
+    availableCredit: 12154.50,
+    color: 'chase',
+    cardType: 'Visa',
+  },
+  {
+    id: '2',
+    bankName: 'American Express',
+    cardNumber: '8976',
+    cardHolder: 'Venkata Eppagunta',
+    dueDate: '2025-01-28',
+    outstandingAmount: 1250.00,
+    minimumDue: 62.50,
+    creditLimit: 10000,
+    availableCredit: 8750.00,
+    color: 'amex',
+    cardType: 'AmericanExpress',
+  },
+  {
+    id: '3',
+    bankName: 'Citi Double Cash',
+    cardNumber: '3421',
+    cardHolder: 'Venkata Eppagunta',
+    dueDate: '2025-02-05',
+    outstandingAmount: 4890.00,
+    minimumDue: 244.50,
+    creditLimit: 20000,
+    availableCredit: 15110.00,
+    color: 'citi',
+    cardType: 'Mastercard',
+  },
+];
+
+export const mockPayments: Payment[] = [
+  {
+    id: '1',
+    cardId: '1',
+    amount: 2500,
+    date: '2024-12-15',
+    status: 'completed',
+    cashback: 25,
+  },
+  {
+    id: '2',
+    cardId: '2',
+    amount: 1200,
+    date: '2024-12-10',
+    status: 'completed',
+    cashback: 24,
+  },
+  {
+    id: '3',
+    cardId: '3',
+    amount: 3200,
+    date: '2024-12-05',
+    status: 'completed',
+    cashback: 64,
+  },
+];
+
+export const mockRewards: Reward[] = [
+  {
+    id: '1',
+    title: 'Cashback Earned',
+    description: 'Total cashback from bill payments',
+    points: 113,
+    icon: '💰',
+    claimed: false,
+    expiryDate: '2025-03-31',
+  },
+  {
+    id: '2',
+    title: 'Streak Bonus',
+    description: '5 consecutive on-time payments',
+    points: 50,
+    icon: '🔥',
+    claimed: false,
+    expiryDate: '2025-02-28',
+  },
+  {
+    id: '3',
+    title: 'Early Payment',
+    description: 'Paid 10 days before due date',
+    points: 25,
+    icon: '⚡',
+    claimed: true,
+    expiryDate: '2025-01-31',
+  },
+];
