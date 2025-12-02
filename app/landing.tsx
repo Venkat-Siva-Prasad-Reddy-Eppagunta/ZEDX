@@ -11,10 +11,7 @@ export default function LandingScreen() {
   const router = useRouter();
 
   return (
-    <LinearGradient
-      colors={['#1a1a1a', '#2d2d2d', '#1a1a1a']}
-      style={styles.container}
-    >
+    
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <View style={styles.logoContainer}>
@@ -92,7 +89,6 @@ export default function LandingScreen() {
           </View>
         </View>
       </SafeAreaView>
-    </LinearGradient>
   );
 }
 

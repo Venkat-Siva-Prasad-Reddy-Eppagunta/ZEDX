@@ -1,3 +1,4 @@
+import { SlotMachine } from '@/components/SlotMachine';
 import { theme } from '@/constants/theme';
 import { useCards } from '@/hooks/useCardsStore';
 import { CreditCard } from '@/types/card';
@@ -6,18 +7,18 @@ import * as Haptics from 'expo-haptics';
 import { CheckCircle, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
-    Alert,
-    Animated,
-    Dimensions,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Animated,
+  Dimensions,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface PaymentModalProps {
@@ -33,6 +34,8 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showSlotMachine, setShowSlotMachine] = useState(false);
+  const [earnedCashback, setEarnedCashback] = useState(0);
   const slideAnim = React.useRef(new Animated.Value(height)).current;
   const successScale = React.useRef(new Animated.Value(0)).current;
 
@@ -85,26 +88,59 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
       });
 
       setIsProcessing(false);
-      setShowSuccess(true);
 
-      Animated.spring(successScale, {
-        toValue: 1,
-        useNativeDriver: true,
-        tension: 50,
-        friction: 3,
-      }).start();
+      // Check if payment is on time
+      const dueDate = new Date(card.dueDate);
+      const today = new Date();
+      const isOnTime = today <= dueDate;
 
-      setTimeout(() => {
-        onClose();
-        setShowSuccess(false);
-        setAmount('');
-        successScale.setValue(0);
-      }, 2000);
+      if (isOnTime) {
+        // Calculate cashback based on amount
+        const cashback = paymentAmount * 0.02; // 2% for on-time payments
+        setEarnedCashback(cashback);
+        setShowSlotMachine(true);
+      } else {
+        // Show regular success message for late payments
+        setShowSuccess(true);
+        Animated.spring(successScale, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 50,
+          friction: 3,
+        }).start();
+
+        setTimeout(() => {
+          onClose();
+          setShowSuccess(false);
+          setAmount('');
+          successScale.setValue(0);
+        }, 2000);
+      }
     }, 1500);
   };
 
   const formatAmount = (value: number) => {
     return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const handleSlotMachineComplete = () => {
+    setShowSlotMachine(false);
+    setShowSuccess(true);
+    Animated.spring(successScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 50,
+      friction: 3,
+    }).start();
+
+    setTimeout(() => {
+      onClose();
+      setShowSuccess(false);
+      setShowSlotMachine(false);
+      setAmount('');
+      setEarnedCashback(0);
+      successScale.setValue(0);
+    }, 2000);
   };
 
   return (
@@ -114,6 +150,12 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
       animationType="none"
       onRequestClose={onClose}
     >
+      {showSlotMachine ? (
+        <SlotMachine
+          cashbackAmount={earnedCashback}
+          onComplete={handleSlotMachineComplete}
+        />
+      ) : (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardContainer}
@@ -206,13 +248,14 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
                   </Animated.View>
                   <Text style={styles.successText}>Payment Successful!</Text>
                   <Text style={styles.successAmount}>${formatAmount(parseFloat(amount))}</Text>
-                  <Text style={styles.cashbackText}>+${formatAmount(parseFloat(amount) * 0.01)} Cashback Earned</Text>
+                  <Text style={styles.cashbackText}>+${formatAmount(earnedCashback || parseFloat(amount) * 0.01)} Cashback Earned</Text>
                 </View>
               )}
             </ScrollView>
           </Animated.View>
         </BlurView>
       </KeyboardAvoidingView>
+      )}
     </Modal>
   );
 }
