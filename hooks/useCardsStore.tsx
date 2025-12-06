@@ -1,5 +1,5 @@
-import { mockCards, mockPayments, mockRewards } from '@/mocks/data';
-import { CreditCard, Payment, Reward } from '@/types/card';
+import { mockCards, mockPayments, mockPaymentSources, mockRewards } from '@/mocks/data';
+import { CreditCard, Payment, PaymentSource, Reward } from '@/types/card';
 import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -10,6 +10,7 @@ export const [CardsProvider, useCards] = createContextHook(() => {
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
+  const [paymentSources, setPaymentSources] = useState<PaymentSource[]>([]);
 
   // Load cards from storage
   const cardsQuery = useQuery({
@@ -35,6 +36,15 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     queryFn: async () => {
       const stored = await AsyncStorage.getItem('rewards');
       return stored ? JSON.parse(stored) : mockRewards;
+    }
+  });
+
+  // Load payment sources from storage
+  const paymentSourcesQuery = useQuery({
+    queryKey: ['paymentSources'],
+    queryFn: async () => {
+      const stored = await AsyncStorage.getItem('paymentSources');
+      return stored ? JSON.parse(stored) : mockPaymentSources;
     }
   });
 
@@ -71,6 +81,17 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     }
   });
 
+  // Sync payment sources mutation
+  const syncPaymentSourcesMutation = useMutation({
+    mutationFn: async (sources: PaymentSource[]) => {
+      await AsyncStorage.setItem('paymentSources', JSON.stringify(sources));
+      return sources;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['paymentSources'] });
+    }
+  });
+
   useEffect(() => {
     if (cardsQuery.data) {
       setCards(cardsQuery.data);
@@ -89,7 +110,12 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     }
   }, [rewardsQuery.data]);
 
-  // --- Existing functions ---
+  useEffect(() => {
+    if (paymentSourcesQuery.data) {
+      setPaymentSources(paymentSourcesQuery.data);
+    }
+  }, [paymentSourcesQuery.data]);
+
   const addCard = (card: CreditCard) => {
     const updated = [...cards, card];
     setCards(updated);
@@ -156,35 +182,18 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     syncRewardsMutation.mutate(updated);
   };
 
-  // --- NEW CLEAR FUNCTIONS --- // remove after testing ==> Testing purpose only
-  const clearCards = async () => {
-    setCards([]);
-    await AsyncStorage.removeItem('cards');
-    queryClient.invalidateQueries({ queryKey: ['cards'] });
+  const addPaymentSource = (source: PaymentSource) => {
+    const updated = [...paymentSources, source];
+    setPaymentSources(updated);
+    syncPaymentSourcesMutation.mutate(updated);
   };
 
-  const clearPayments = async () => {
-    setPayments([]);
-    await AsyncStorage.removeItem('payments');
-    queryClient.invalidateQueries({ queryKey: ['payments'] });
+  const removePaymentSource = (sourceId: string) => {
+    const updated = paymentSources.filter(s => s.id !== sourceId);
+    setPaymentSources(updated);
+    syncPaymentSourcesMutation.mutate(updated);
   };
 
-  const clearRewards = async () => {
-    setRewards([]);
-    await AsyncStorage.removeItem('rewards');
-    queryClient.invalidateQueries({ queryKey: ['rewards'] });
-  };
-
-  const clearAll = async () => {
-    setCards([]);
-    setPayments([]);
-    setRewards([]);
-    await AsyncStorage.multiRemove(['cards', 'payments', 'rewards']);
-    queryClient.invalidateQueries();
-  }; // remove after testing ==> Testing purpose only
-  // --- END NEW CLEAR FUNCTIONS ---
-
-  // --- Stats ---
   const totalOutstanding = useMemo(() => 
     cards.reduce((sum, card) => sum + card.outstandingAmount, 0),
     [cards]
@@ -199,17 +208,16 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     cards,
     payments,
     rewards,
+    paymentSources,
     addCard,
     removeCard,
     makePayment,
     claimReward,
-    clearCards,
-    clearPayments,
-    clearRewards,
-    clearAll,
+    addPaymentSource,
+    removePaymentSource,
     totalOutstanding,
     totalCashback,
-    isLoading: cardsQuery.isLoading || paymentsQuery.isLoading || rewardsQuery.isLoading,
+    isLoading: cardsQuery.isLoading || paymentsQuery.isLoading || rewardsQuery.isLoading || paymentSourcesQuery.isLoading,
   };
 });
 

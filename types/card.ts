@@ -10,7 +10,7 @@ export interface CreditCard {
   availableCredit: number;
   color: string; // Gradient color for card
   bankLogo?: string;
-  cardType: string; // Type of card (e.g., Visa, Mastercard, etc.)
+  cardType: string;
 }
 
 export interface Payment {
@@ -30,4 +30,15 @@ export interface Reward {
   icon: string;
   claimed: boolean;
   expiryDate: string;
+}
+
+export type PaymentSourceType = 'debit_card' | 'bank_account' | 'credit_card';
+
+export interface PaymentSource {
+  id: string;
+  type: PaymentSourceType;
+  name: string;
+  last4: string;
+  bankName?: string;
+  accountType?: string;
 }
