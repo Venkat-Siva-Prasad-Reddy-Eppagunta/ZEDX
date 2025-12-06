@@ -14,6 +14,8 @@ export const theme = {
     text: '#FFFFFF',
     textSecondary: '#9CA3AF',
     textMuted: '#6B7280',
+    border: '#1F1F1F',
+    primaryLight: '#001F29',
     
     gradients: {
       chase: ['#003D82', '#0066CC'] as const,

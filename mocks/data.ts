@@ -1,4 +1,4 @@
-import { CreditCard, Payment, Reward } from '@/types/card';
+import { CreditCard, Payment, PaymentSource, Reward } from '@/types/card';
 
 export const mockCards: CreditCard[] = [
   {
@@ -96,5 +96,23 @@ export const mockRewards: Reward[] = [
     icon: '⚡',
     claimed: true,
     expiryDate: '2025-01-31',
+  },
+];
+
+export const mockPaymentSources: PaymentSource[] = [
+  {
+    id: '1',
+    type: 'debit_card',
+    name: 'Personal Debit',
+    last4: '1234',
+    bankName: 'Bank of America',
+  },
+  {
+    id: '2',
+    type: 'bank_account',
+    name: 'Checking Account',
+    last4: '5678',
+    bankName: 'Wells Fargo',
+    accountType: 'Checking',
   },
 ];
