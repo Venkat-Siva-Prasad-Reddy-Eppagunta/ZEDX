@@ -4,11 +4,11 @@ import { Stack } from 'expo-router';
 import { Award, Info, RefreshCw, Target, TrendingDown, TrendingUp } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 type CreditScoreHistory = {
@@ -82,7 +82,7 @@ export default function CreditScoreScreen() {
   
   const getScoreRating = (score: number) => {
     if (score >= 800) return { rating: 'Excellent', color: theme.colors.success };
-    if (score >= 740) return { rating: 'Very Good', color: theme.colors.success };
+    if (score >= 720) return { rating: 'Very Good', color: theme.colors.success };
     if (score >= 670) return { rating: 'Good', color: theme.colors.primary };
     if (score >= 580) return { rating: 'Fair', color: theme.colors.warning };
     return { rating: 'Poor', color: theme.colors.danger };
