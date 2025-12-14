@@ -1,46 +1,5 @@
-import { CreditCard, Payment, PaymentSource, Reward } from '@/types/card';
+import { Payment, PaymentSource, Reward } from '@/types/card';
 
-export const mockCards: CreditCard[] = [
-  {
-    id: '1',
-    bankName: 'Chase Sapphire',
-    cardNumber: '4532',
-    cardHolder: 'Venkat Reddy',
-    dueDate: '2026-01-25',
-    outstandingAmount: 2845.50,
-    minimumDue: 142.25,
-    creditLimit: 15000,
-    availableCredit: 12154.50,
-    color: 'chase',
-    cardType: 'Visa',
-  },
-  {
-    id: '2',
-    bankName: 'American Express',
-    cardNumber: '8976',
-    cardHolder: 'Venkata Eppagunta',
-    dueDate: '2026-01-28',
-    outstandingAmount: 1250.00,
-    minimumDue: 62.50,
-    creditLimit: 10000,
-    availableCredit: 8750.00,
-    color: 'amex',
-    cardType: 'AmericanExpress',
-  },
-  {
-    id: '3',
-    bankName: 'Citi Double Cash',
-    cardNumber: '3421',
-    cardHolder: 'Venkata Eppagunta',
-    dueDate: '2026-02-05',
-    outstandingAmount: 4890.00,
-    minimumDue: 244.50,
-    creditLimit: 20000,
-    availableCredit: 15110.00,
-    color: 'citi',
-    cardType: 'Mastercard',
-  },
-];
 
 export const mockPayments: Payment[] = [
   {

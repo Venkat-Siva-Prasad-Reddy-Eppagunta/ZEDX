@@ -1,12 +1,14 @@
-import { mockCards, mockPayments, mockPaymentSources, mockRewards } from '@/mocks/data';
+import { mockPayments, mockPaymentSources, mockRewards } from '@/mocks/data';
 import { CreditCard, Payment, PaymentSource, Reward } from '@/types/card';
 import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAuth } from './useAuthStore';
 
 export const [CardsProvider, useCards] = createContextHook(() => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
@@ -17,7 +19,7 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     queryKey: ['cards'],
     queryFn: async () => {
       const stored = await AsyncStorage.getItem('cards');
-      return stored ? JSON.parse(stored) : mockCards;
+      return stored ? JSON.parse(stored) : [];
     }
   });
 
@@ -194,6 +196,30 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     syncPaymentSourcesMutation.mutate(updated);
   };
 
+  const setUserCards = useCallback((userCards: any[]) => {
+      const formattedCards: CreditCard[] = userCards.map(card => ({
+        id: card.id.toString(),
+        bankName: card.name,
+        cardNumber: card.mask,
+        outstandingAmount: parseFloat(card.current_balance) || 0,
+        availableCredit: parseFloat(card.available_balance) || 0,
+        creditLimit: parseFloat(card.credit_limit) || 0,
+        minimumDue: parseFloat(card.min_due) || 0,
+        dueDate: card.next_due_date || null,
+        cardHolder: `${user?.first_name ?? 'Unknown'} ${user?.last_name ?? ''}`.trim(),
+        color: 'default', // Default color
+        cardType: 'Unknown', // Default card type
+      }));
+
+      setCards(formattedCards);
+      syncCardsMutation.mutate(formattedCards);
+  }, [syncCardsMutation, user]);
+
+  const clearCards = useCallback(() => {
+    setCards([]);
+    syncCardsMutation.mutate([]); // Clear cards in AsyncStorage
+  }, [syncCardsMutation]);
+
   const totalOutstanding = useMemo(() => 
     cards.reduce((sum, card) => sum + card.outstandingAmount, 0),
     [cards]
@@ -215,6 +241,8 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     claimReward,
     addPaymentSource,
     removePaymentSource,
+    setUserCards,
+    clearCards, // Expose clearCards method
     totalOutstanding,
     totalCashback,
     isLoading: cardsQuery.isLoading || paymentsQuery.isLoading || rewardsQuery.isLoading || paymentSourcesQuery.isLoading,

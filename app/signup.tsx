@@ -60,7 +60,6 @@ export default function SignupScreen() {
       });
 
       const data = await res.json().catch(() => ({}));
-      console.log('Signup response data:', data);
 
       if (!res.ok || !data.user) throw new Error(data.error || 'Signup failed');
 

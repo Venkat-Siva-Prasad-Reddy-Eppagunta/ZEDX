@@ -70,11 +70,11 @@ export default function ProfileScreen() {
           <View style={styles.avatar}>
             <User size={40} color={theme.colors.text} />
           </View>
-          <Text style={styles.userName}>{user?.firstName} {user?.lastName}</Text>
+          <Text style={styles.userName}>{user?.first_name} {user?.last_name}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
           <View style={styles.creditScoreBadge}>
             <Text style={styles.creditScoreLabel}>Credit Score</Text>
-            <Text style={styles.creditScoreValue}>{user?.creditScore || 720}</Text>
+            <Text style={styles.creditScoreValue}>{user?.credit_score || 720}</Text>
           </View>
         </View>
 

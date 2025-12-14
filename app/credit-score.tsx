@@ -16,11 +16,11 @@ export default function CreditScoreScreen() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [displayScore, setDisplayScore] = useState(0);
+  const [displayScore, setDisplayScore] = useState(user?.credit_score || 650);
   const animatedValue = React.useRef(new Animated.Value(0)).current;
   const scaleAnim = React.useRef(new Animated.Value(0.5)).current;
 
-  const creditScore = user?.creditScore || 720;
+  const creditScore = user?.credit_score || 650;
 
   // If no user exists (rare), redirect to login
   useEffect(() => {
@@ -53,7 +53,6 @@ export default function CreditScoreScreen() {
   }, [creditScore, animatedValue, scaleAnim]);
 
   if (!user) return null; // safety fallback
-  console.log('User Credit Score:', user);
 
   const getCreditRating = (score: number) => {
     if (score >= 800) return { rating: 'Excellent', color: '#4CAF50' };

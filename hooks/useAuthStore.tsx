@@ -8,7 +8,7 @@ export interface User {
   last_name: string;
   email: string;
   password?: string;
-  creditScore?: number;
+  credit_score?: number;
   cards?: any[];
   isVerified: boolean;
   agreedToTerms: boolean;
@@ -51,11 +51,12 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const clearTempUserData = () => setTempUserData({});
 
-  const logout = async () => {
+  const logout = async (onLogout?: () => void) => {
     try {
       await AsyncStorage.removeItem('user');
       setUser(null);
       setTempUserData({});
+      if (onLogout) onLogout(); // Call the callback to clear cards
     } catch (err) {
       console.error('Error logging out', err);
     }

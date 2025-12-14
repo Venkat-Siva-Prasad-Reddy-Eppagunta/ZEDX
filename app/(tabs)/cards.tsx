@@ -12,11 +12,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 export default function CardsScreen() {
-  const { cards, removeCard, clearCards } = useCards(); //remove clearCards after testing ==> Testing purpose only
+  const { cards, removeCard } = useCards();
+
 
   const handleAddCard = () => {
     if (Platform.OS !== 'web') {
@@ -51,26 +52,6 @@ export default function CardsScreen() {
       ]
     );
   };
-
-  const handleClearAll = () => {
-    Alert.alert(
-      'Clear All Cards',
-      'Are you sure you want to remove all saved cards?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear All',
-          style: 'destructive',
-          onPress: async () => {
-            if (Platform.OS !== 'web') {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-            }
-            clearCards();
-          },
-        },
-      ]
-    );
-  }; //remove after testing ==> Testing purpose only
 
   return (
     <View style={styles.container}>
@@ -121,17 +102,6 @@ export default function CardsScreen() {
                 </View>
               ))}
             </View>
-
-            {/* 🔹 Clear All Button Testing Purpose Only ==> Reomve after tesing */}
-            <TouchableOpacity
-              style={[styles.actionButton, styles.deleteButton, { margin: 16 }]}
-              onPress={handleClearAll}
-            >
-              <Trash2 size={16} color={theme.colors.danger} />
-              <Text style={[styles.actionButtonText, styles.deleteButtonText]}>
-                Clear All Cards
-              </Text>
-            </TouchableOpacity>
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Card Benefits</Text>

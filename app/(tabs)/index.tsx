@@ -19,24 +19,38 @@ import {
 } from 'react-native';
 
 export default function HomeScreen() {
-  const { cards, totalOutstanding, totalCashback, isLoading } = useCards();
+  const { cards, totalOutstanding, totalCashback, setUserCards } = useCards();
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace('/landing');
-    }
-  }, [user, authLoading, router]);
+useEffect(() => {
+  if (authLoading) return;
+
+  if (!user) {
+    router.replace('/landing');
+    return;
+  }
+
+  // if (!user.cards || cards.length === 0) {
+  //   //clearCards();
+  //   router.replace('/credit-score');
+  //   return;
+  // }
+
+  // // initialize ONCE per user
+  // //clearCards();
+  // setUserCards(user.cards);
+
+}, [user, user?.id, authLoading, cards, setUserCards, router]); // ✅ key change
 
   const handleCardPress = (cardId: string) => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    
+
     Animated.sequence([
       Animated.timing(scaleAnim, {
         toValue: 0.95,
@@ -49,7 +63,7 @@ export default function HomeScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-    
+
     setSelectedCard(cardId);
   };
 
@@ -82,10 +96,10 @@ export default function HomeScreen() {
         {/* Welcome Header */}
         <View style={styles.welcomeSection}>
           <Text style={styles.welcomeText}>Welcome back,</Text>
-          <Text style={styles.userName}>{user?.firstName} {user?.lastName}</Text>
+          <Text style={styles.userName}>{user?.first_name} {user?.last_name}</Text>
           <View style={styles.creditScoreBadge}>
             <Text style={styles.creditScoreLabel}>Credit Score</Text>
-            <Text style={styles.creditScoreValue}>{user?.creditScore || 0}</Text>
+            <Text style={styles.creditScoreValue}>{user?.credit_score || 0}</Text>
           </View>
         </View>
 
@@ -98,7 +112,7 @@ export default function HomeScreen() {
             </View>
             <Text style={styles.statValue}>{formatAmount(totalOutstanding)}</Text>
           </View>
-          
+
           <View style={[styles.statCard, styles.statCardSecondary]}>
             <View style={styles.statHeader}>
               <TrendingUp size={20} color={theme.colors.success} />
@@ -137,9 +151,9 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
         </View>
-        
+
         <View style={styles.quickActions}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.actionButton}
             onPress={() => router.push('/spending-analysis')}
           >
@@ -149,8 +163,8 @@ export default function HomeScreen() {
             <Text style={styles.actionText}>Spending</Text>
             <Text style={styles.actionSubtext}>Analysis</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.actionButton}
             onPress={() => router.push('/payment-reminders')}
           >
@@ -160,8 +174,8 @@ export default function HomeScreen() {
             <Text style={styles.actionText}>Payment</Text>
             <Text style={styles.actionSubtext}>Reminders</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.actionButton}
             onPress={() => router.push('/card-benefits')}
           >
@@ -171,8 +185,8 @@ export default function HomeScreen() {
             <Text style={styles.actionText}>Card</Text>
             <Text style={styles.actionSubtext}>Benefits</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.actionButton}
             onPress={() => router.push('/credit-score-details')}
           >

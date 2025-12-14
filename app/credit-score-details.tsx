@@ -76,7 +76,7 @@ export default function CreditScoreScreen() {
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState<'3m' | '6m' | '1y'>('6m');
   
-  const currentScore = user?.creditScore || 748;
+  const currentScore = user?.credit_score || 748;
   const previousScore = mockHistory[mockHistory.length - 2]?.score || 742;
   const scoreChange = currentScore - previousScore;
   
