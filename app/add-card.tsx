@@ -32,8 +32,6 @@ export default function AddCard() {
         throw new Error("Failed to get Plaid link token");
       }
 
-      console.log("Received link token:", data.link_token);
-
       return data.link_token;
     } catch (error) {
       console.error("Error creating link token:", error);
@@ -46,7 +44,7 @@ export default function AddCard() {
 
   // STEP 2: Launch Plaid Link
   const handlePlaid = async () => {
-    if (loading) return; // Prevent multiple calls if already loading
+    if (loading) return;
 
     const linkToken = await createLinkToken();
     if (!linkToken) return;
@@ -123,6 +121,7 @@ export default function AddCard() {
 
       <TouchableOpacity
         onPress={handlePlaid}
+        disabled={loading}
         style={{
           backgroundColor: "#0dbd8b",
           padding: 15,
