@@ -42,9 +42,11 @@ useEffect(() => {
 
   // // initialize ONCE per user
   // //clearCards();
-  // setUserCards(user.cards);
+  // if (user.cards && user.cards.length > 0){
+  //   setUserCards(user.cards);
+  // }
 
-}, [user, user?.id, authLoading, cards, setUserCards, router]); // ✅ key change
+}, [user, authLoading, setUserCards, router]); // ✅ key change
 
   const handleCardPress = (cardId: string) => {
     if (Platform.OS !== 'web') {

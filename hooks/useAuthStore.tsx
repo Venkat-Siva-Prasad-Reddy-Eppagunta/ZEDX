@@ -10,7 +10,7 @@ export interface User {
   password?: string;
   credit_score?: number;
   cards?: any[];
-  isVerified: boolean;
+  is_verified: boolean;
   agreedToTerms: boolean;
   token?: string;
 }
@@ -45,6 +45,13 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     }
   };
 
+  const setUserVerified = async (isVerified: boolean) => {
+    if (user) {
+      const updatedUser = { ...user, is_verified: isVerified };
+      await saveUser(updatedUser);
+    }
+  };
+
   const updateTempUserData = (data: Partial<User>) => {
     setTempUserData(prev => ({ ...prev, ...data }));
   };
@@ -56,6 +63,8 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       await AsyncStorage.removeItem('user');
       setUser(null);
       setTempUserData({});
+      await AsyncStorage.removeItem('cards'); // Clear cards on logout
+
       if (onLogout) onLogout(); // Call the callback to clear cards
     } catch (err) {
       console.error('Error logging out', err);
@@ -67,6 +76,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     isLoading,
     tempUserData,
     saveUser,
+    setUserVerified,
     updateTempUserData,
     clearTempUserData,
     logout,

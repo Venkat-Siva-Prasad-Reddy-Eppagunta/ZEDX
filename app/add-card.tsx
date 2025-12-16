@@ -18,7 +18,7 @@ export default function AddCard() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://Venkatas-MacBook-Air.local:5001/api/plaid/create-link-token", {
+      const response = await fetch("http://Venkatas-MacBook-Air.local:5001/api/plaid/create-link-token?flow=cards", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user?.token}`,
@@ -58,7 +58,7 @@ export default function AddCard() {
         const publicToken = success.publicToken;
 
         // STEP 3: Send public_token to backend
-        await exchangePublicToken(publicToken);
+        await exchangeCardToken(publicToken);
 
         Alert.alert("Success", "Card linked successfully.");
 
@@ -73,10 +73,10 @@ export default function AddCard() {
     });
   };
 
-  // STEP 3: Exchange public_token with backend
-  const exchangePublicToken = async (publicToken: string) => {
+  // STEP 3: Exchange card token with backend
+  const exchangeCardToken = async (publicToken: string) => {
     try {
-      const res = await fetch("http://Venkatas-MacBook-Air.local:5001/api/plaid/exchange-public-token", {
+      const res = await fetch("http://Venkatas-MacBook-Air.local:5001/api/plaid/exchange-card-token", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user?.token}`,
@@ -92,7 +92,7 @@ export default function AddCard() {
       }
 
       // Save cards into global store
-      setUserCards(data.cards);
+      setUserCards(data.cards, user?.first_name ?? 'Unknown');
     } catch (error) {
       console.error("Error exchanging token:", error);
       Alert.alert("Error", "Unable to link your card.");

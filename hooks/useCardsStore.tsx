@@ -4,11 +4,11 @@ import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAuth } from './useAuthStore';
+//import { useAuth } from './useAuthStore';
 
 export const [CardsProvider, useCards] = createContextHook(() => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  //const { user } = useAuth();
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
@@ -196,7 +196,7 @@ export const [CardsProvider, useCards] = createContextHook(() => {
     syncPaymentSourcesMutation.mutate(updated);
   };
 
-  const setUserCards = useCallback((userCards: any[]) => {
+  const setUserCards = useCallback((userCards: any[], userName: string) => {
       const formattedCards: CreditCard[] = userCards.map(card => ({
         id: card.id.toString(),
         bankName: card.name,
@@ -206,14 +206,14 @@ export const [CardsProvider, useCards] = createContextHook(() => {
         creditLimit: parseFloat(card.credit_limit) || 0,
         minimumDue: parseFloat(card.min_due) || 0,
         dueDate: card.next_due_date || null,
-        cardHolder: `${user?.first_name ?? 'Unknown'} ${user?.last_name ?? ''}`.trim(),
+        cardHolder: userName,
         color: 'default', // Default color
         cardType: 'Unknown', // Default card type
       }));
 
       setCards(formattedCards);
       syncCardsMutation.mutate(formattedCards);
-  }, [syncCardsMutation, user]);
+  }, [syncCardsMutation]);
 
   const clearCards = useCallback(() => {
     setCards([]);

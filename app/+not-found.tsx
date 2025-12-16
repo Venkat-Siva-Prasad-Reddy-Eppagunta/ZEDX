@@ -34,7 +34,7 @@ function RootLayoutNav() {
       <Stack.Screen name="landing" options={{ headerShown: false }} />
       <Stack.Screen name="signup" options={{ headerShown: false }} />
       <Stack.Screen name="verify-otp" options={{ headerShown: false }} />
-      <Stack.Screen name="ssn-verification" options={{ headerShown: false }} />
+      <Stack.Screen name="kyc" options={{ headerShown: false }} />
       <Stack.Screen name="credit-score" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen 

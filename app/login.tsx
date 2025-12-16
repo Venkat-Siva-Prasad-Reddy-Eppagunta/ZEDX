@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/useAuthStore';
+import { useCards } from '@/hooks/useCardsStore';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -18,6 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function LoginScreen() {
   const router = useRouter();
   const { saveUser } = useAuth();
+  const { setUserCards } = useCards();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -65,10 +67,14 @@ export default function LoginScreen() {
       });
 
       // Redirect based on card availability
-      if (user.cards && user.cards.length > 0) {
+      if (user.is_verified && user.cards && user.cards.length > 0) {
+        setUserCards(user.cards, user.first_name);
         router.replace('/(tabs)');
-      } else {
-        router.replace('/credit-score');
+      } else if (!user.is_verified) {
+        router.replace('/kyc');
+      }
+      else {
+        router.replace('/add-card');
       }
     } catch (err: any) {
       Alert.alert('Login Error', err.message);

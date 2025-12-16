@@ -44,7 +44,7 @@ export default function SignupScreen() {
         email,
         password,
         agreedToTerms,
-        isVerified: true,
+        is_verified: false,
       });
 
       const res = await fetch('http://Venkatas-MacBook-Air.local:5001/api/register', {
@@ -55,7 +55,7 @@ export default function SignupScreen() {
           last_name,
           email,
           password,
-          isVerified: true,
+          is_verified: false,
         }),
       });
 
