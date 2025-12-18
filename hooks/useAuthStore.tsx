@@ -64,6 +64,9 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       setUser(null);
       setTempUserData({});
       await AsyncStorage.removeItem('cards'); // Clear cards on logout
+      await AsyncStorage.removeItem('payments'); // Clear payments on logout
+      await AsyncStorage.removeItem('rewards'); // Clear rewards on logout
+      await AsyncStorage.removeItem('fundingSources'); // Clear funding sources on logout
 
       if (onLogout) onLogout(); // Call the callback to clear cards
     } catch (err) {

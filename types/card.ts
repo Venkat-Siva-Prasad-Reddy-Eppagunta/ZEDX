@@ -1,14 +1,14 @@
 export interface CreditCard {
   id: string;
   bankName: string;
-  cardNumber: string; // Last 4 digits
+  cardNumber: string;
   cardHolder: string;
   dueDate: string;
   outstandingAmount: number;
   minimumDue: number;
   creditLimit: number;
   availableCredit: number;
-  color: string; // Gradient color for card
+  color: string;
   bankLogo?: string;
   cardType: string;
 }
@@ -33,12 +33,12 @@ export interface Reward {
 }
 
 export type PaymentSourceType = 'debit_card' | 'bank_account' | 'credit_card';
-
-export interface PaymentSource {
-  id: string;
-  type: PaymentSourceType;
-  name: string;
+/* 🔥 NEW — matches dwolla_funding_sources table */
+export interface DwollaFundingSource {
+  id: number; // DB primary key
+  funding_source_id: string;
+  name: string; // display name
+  type: string; // 'checking' | 'savings'
+  status: string;
   last4: string;
-  bankName?: string;
-  accountType?: string;
 }

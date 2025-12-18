@@ -19,7 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function LoginScreen() {
   const router = useRouter();
   const { saveUser } = useAuth();
-  const { setUserCards } = useCards();
+  const { setUserCards, setPaymentSources } = useCards();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,61 +27,74 @@ export default function LoginScreen() {
 
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleLogin = async () => {
-    if (!validateEmail(email)) {
-      return Alert.alert('Invalid Email', 'Please enter a valid email address.');
+const handleLogin = async () => {
+  if (!validateEmail(email)) {
+    return Alert.alert('Invalid Email', 'Please enter a valid email address.');
+  }
+
+  if (!password.trim()) {
+    return Alert.alert('Invalid Password', 'Please enter your password.');
+  }
+
+  setLoading(true);
+
+  try {
+    // 1 Login
+    const res = await fetch('http://Venkatas-MacBook-Air.local:5001/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Login failed');
+
+    const { token } = data;
+    if (!token) throw new Error('Missing auth token');
+
+    // 2 Fetch /me
+    const meRes = await fetch(
+      'http://Venkatas-MacBook-Air.local:5001/api/me',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const meData = await meRes.json();
+    if (!meRes.ok) throw new Error(meData.message || 'Failed to fetch user');
+
+    const { user, cards, fundingSources } = meData;
+
+
+    // 3 Save user
+    await saveUser({ ...user, token });
+
+    // 4 Populate cards
+    if (cards?.length) {
+      await setUserCards(cards, user.first_name);
     }
 
-    if (!password.trim()) {
-      return Alert.alert('Invalid Password', 'Please enter your password.');
+    // 5 Populate bank accounts
+    if (fundingSources?.length) {
+      await setPaymentSources(fundingSources);
     }
 
-    setLoading(true);
-
-    try {
-      const res = await fetch('http://Venkatas-MacBook-Air.local:5001/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Expecting backend response:
-      // { user: {...}, token: "....."}
-
-      const { user, token } = data;
-
-      if (!user || !token) {
-        throw new Error('Invalid API response. Missing user or token.');
-      }
-
-      // Save full user session
-      await saveUser({
-        ...user,
-        token,
-      });
-
-      // Redirect based on card availability
-      if (user.is_verified && user.cards && user.cards.length > 0) {
-        setUserCards(user.cards, user.first_name);
-        router.replace('/(tabs)');
-      } else if (!user.is_verified) {
-        router.replace('/kyc');
-      }
-      else {
-        router.replace('/add-card');
-      }
-    } catch (err: any) {
-      Alert.alert('Login Error', err.message);
-    } finally {
-      setLoading(false);
+    // 6 Routing
+    if (!user.is_verified) {
+      router.replace('/kyc');
+    } else if (!cards?.length) {
+      router.replace('/add-card');
+    } else {
+      router.replace('/(tabs)');
     }
-  };
+  } catch (err: any) {
+    Alert.alert('Login Error', err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>

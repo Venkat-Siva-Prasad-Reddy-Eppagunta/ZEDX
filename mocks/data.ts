@@ -1,5 +1,4 @@
-import { Payment, PaymentSource, Reward } from '@/types/card';
-
+import { Payment, Reward } from '@/types/card';
 
 export const mockPayments: Payment[] = [
   {
@@ -10,7 +9,7 @@ export const mockPayments: Payment[] = [
     status: 'completed',
     cashback: 25,
   },
-  {
+    {
     id: '2',
     cardId: '2',
     amount: 1200,
@@ -38,7 +37,7 @@ export const mockRewards: Reward[] = [
     claimed: false,
     expiryDate: '2025-03-31',
   },
-  {
+    {
     id: '2',
     title: 'Streak Bonus',
     description: '5 consecutive on-time payments',
@@ -55,23 +54,5 @@ export const mockRewards: Reward[] = [
     icon: '⚡',
     claimed: true,
     expiryDate: '2025-01-31',
-  },
-];
-
-export const mockPaymentSources: PaymentSource[] = [
-  {
-    id: '1',
-    type: 'debit_card',
-    name: 'Personal Debit',
-    last4: '1234',
-    bankName: 'Bank of America',
-  },
-  {
-    id: '2',
-    type: 'bank_account',
-    name: 'Checking Account',
-    last4: '5678',
-    bankName: 'Wells Fargo',
-    accountType: 'Checking',
   },
 ];

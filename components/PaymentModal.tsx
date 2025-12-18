@@ -2,7 +2,7 @@ import { AddPaymentSourceModal } from '@/components/AddPaymentSourceModal';
 import { SlotMachine } from '@/components/SlotMachine';
 import { theme } from '@/constants/theme';
 import { useCards } from '@/hooks/useCardsStore';
-import { CreditCard, PaymentSource, PaymentSourceType } from '@/types/card';
+import { CreditCard, DwollaFundingSource, PaymentSourceType } from '@/types/card';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { Building2, CheckCircle, ChevronDown, CreditCard as CreditCardIcon, Plus, X } from 'lucide-react-native';
@@ -61,7 +61,7 @@ const paymentMethods: PaymentMethodOption[] = [
 const { height } = Dimensions.get('window');
 
 export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
-  const { makePayment, paymentSources, addPaymentSource, cards } = useCards();
+  const { makePayment, fundingSources, setPaymentSources, addPaymentSource, cards } = useCards();
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -70,7 +70,7 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
   const [showPaymentMethodPicker, setShowPaymentMethodPicker] = useState(false);
   const [showSourceSelector, setShowSourceSelector] = useState(false);
-  const [selectedSource, setSelectedSource] = useState<PaymentSource | null>(null);
+  const [selectedSource, setSelectedSource] = useState<DwollaFundingSource | null>(null);
   const [showAddSourceModal, setShowAddSourceModal] = useState(false);
   const [addSourceType, setAddSourceType] = useState<PaymentSourceType>('debit_card');
   const slideAnim = React.useRef(new Animated.Value(height)).current;
@@ -92,6 +92,12 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
       }).start();
     }
   }, [visible, slideAnim]);
+
+  React.useEffect(() => {
+    if (visible && fundingSources.length === 0) {
+      setShowAddSourceModal(true);
+    }
+  }, [visible, fundingSources]);
 
   const selectedMethod = selectedPaymentMethod ? paymentMethods.find(m => m.type === selectedPaymentMethod) : null;
   const processingFee = selectedMethod ? parseFloat(amount || '0') * selectedMethod.fee : 0;
@@ -119,24 +125,35 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
     }
   };
 
-  const handleSourceSelect = (source: PaymentSource) => {
+  const handleSourceSelect = (source: DwollaFundingSource) => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setSelectedSource(source);
+    if(source){
+      setSelectedSource(source);
+    }
+    else {
+      setShowAddSourceModal(true);
+    }
   };
 
+
   const handleAddSource = (sourceData: {
-    type: PaymentSourceType;
+    id: number;
+    funding_source_id: string;
     name: string;
+    type: string;
+    status: string;
     last4: string;
-    bankName: string;
-    accountType?: string;
-  }) => {
-    const newSource: PaymentSource = {
-      id: Date.now().toString(),
-      ...sourceData,
-    };
+  }) =>   {
+  const newSource: DwollaFundingSource = {
+  id: sourceData.id,
+  funding_source_id: sourceData.funding_source_id,
+  name: sourceData.name,
+  type: sourceData.type,
+  status: sourceData.status,
+  last4: sourceData.last4,
+};
     addPaymentSource(newSource);
     setSelectedSource(newSource);
   };
@@ -348,12 +365,12 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
                     )}
                   </View>
 
-                  {showSourceSelector && selectedPaymentMethod === 'debit_card' && (
+                  {/* {showSourceSelector && selectedPaymentMethod === 'debit_card' && (
                     <View style={styles.inputSection}>
                       <Text style={styles.inputLabel}>Select Debit Card</Text>
                       <View style={styles.sourcesList}>
-                        {paymentSources
-                          .filter(s => s.type === 'debit_card')
+                        {fundingSources
+                          .filter(s => s.type === 'checking' || s.type === 'saving')
                           .map((source) => (
                             <TouchableOpacity
                               key={source.id}
@@ -368,7 +385,7 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
                                 <View style={styles.sourceText}>
                                   <Text style={styles.sourceName}>{source.name}</Text>
                                   <Text style={styles.sourceDetails}>
-                                    {source.bankName} •••• {source.last4}
+                                    {source.name} •••• {source.last4}
                                   </Text>
                                 </View>
                               </View>
@@ -392,37 +409,35 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
                         </TouchableOpacity>
                       </View>
                     </View>
-                  )}
+                  )} */}
 
                   {showSourceSelector && selectedPaymentMethod === 'bank_account' && (
                     <View style={styles.inputSection}>
                       <Text style={styles.inputLabel}>Select Bank Account</Text>
                       <View style={styles.sourcesList}>
-                        {paymentSources
-                          .filter(s => s.type === 'bank_account')
-                          .map((source) => (
-                            <TouchableOpacity
-                              key={source.id}
-                              style={[
-                                styles.sourceItem,
-                                selectedSource?.id === source.id && styles.sourceItemSelected
-                              ]}
-                              onPress={() => handleSourceSelect(source)}
-                            >
-                              <View style={styles.sourceLeft}>
-                                <Building2 size={20} color={theme.colors.primary} />
-                                <View style={styles.sourceText}>
-                                  <Text style={styles.sourceName}>{source.name}</Text>
-                                  <Text style={styles.sourceDetails}>
-                                    {source.bankName} •••• {source.last4}
-                                  </Text>
-                                </View>
+                        {fundingSources && fundingSources.map((source) => (
+                          <TouchableOpacity
+                            key={`${source.id}-${source.funding_source_id}`}
+                            style={[
+                              styles.sourceItem,
+                              selectedSource?.id === source.id && styles.sourceItemSelected
+                            ]}
+                            onPress={() => handleSourceSelect(source)}
+                          >
+                            <View style={styles.sourceLeft}>
+                              <Building2 size={20} color={theme.colors.primary} />
+                              <View style={styles.sourceText}>
+                                <Text style={styles.sourceName}>{source.name}</Text>
+                                <Text style={styles.sourceDetails}>
+                                  {source.name} •••• {source.last4}
+                                </Text>
                               </View>
-                              {selectedSource?.id === source.id && (
-                                <CheckCircle size={20} color={theme.colors.primary} />
-                              )}
-                            </TouchableOpacity>
-                          ))}
+                            </View>
+                            {selectedSource?.id === source.id && (
+                              <CheckCircle size={20} color={theme.colors.primary} />
+                            )}
+                          </TouchableOpacity>
+                        ))}
                         <TouchableOpacity
                           style={styles.addSourceButton}
                           onPress={() => {
@@ -440,7 +455,7 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
                     </View>
                   )}
 
-                  {showSourceSelector && selectedPaymentMethod === 'credit' && (
+                  {/* {showSourceSelector && selectedPaymentMethod === 'credit' && (
                     <View style={styles.inputSection}>
                       <Text style={styles.inputLabel}>Select Credit Card</Text>
                       <View style={styles.sourcesList}>
@@ -487,7 +502,7 @@ export function PaymentModal({ visible, onClose, card }: PaymentModalProps) {
                         </View>
                       </View>
                     </View>
-                  )}
+                  )} */}
 
                   <View style={styles.inputSection}>
                     <Text style={styles.inputLabel}>Enter Amount</Text>
