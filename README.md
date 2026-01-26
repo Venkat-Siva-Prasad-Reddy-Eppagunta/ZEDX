@@ -48,8 +48,8 @@ This repository contains the frontend of the ZEDX application, built using Expo 
 > Screenshots are stored in `app-files/`.
 
 ### Landing / Auth
-| Landing | Login | Register | Verify OTP |
-|---|---|---|---|
+| Landing | Login | Register | 
+|---|---|---|
 | ![Landing](./app-files/landing.png) | ![Login](./app-files/Login.png) | ![Register](./app-files/Register.png)
 
 ### Home / Core
