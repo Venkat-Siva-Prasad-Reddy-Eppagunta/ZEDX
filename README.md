@@ -97,4 +97,4 @@ Your support helps us improve and maintain this project!
 
 - **Venkat Siva Prasad Reddy Eppagunta**
 - GitHub: [![GitHub](https://img.shields.io/badge/GitHub-Venkat_Siva_Prasa_Reddy_Eppagunta-black?style=flat&logo=github&logoColor=white)](https://github.com/Venkat-Siva-Prasad-Reddy-Eppagunta)
-- LinkedIn: [![LinkedIn](https://img.shields.io/badge/LinkedIn-Venka_Siva_Prasa_Reddy_Eppagunta-blue?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/venkata-siva-prasad-reddy-eppagunta-1b25ab168/)
+- LinkedIn: [![LinkedIn](https://img.shields.io/badge/LinkedIn-Venka_Siva_Prasa_Reddy_Eppagunta-blue?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/venkata-eppagunta/)
