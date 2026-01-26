@@ -1,5 +1,10 @@
 
-# ZEDX Frontend – Mobile Application
+<p align="center">
+  <img src="./assets/images/icon.png" alt="ZEDX Logo" width="80" />
+</p>
+
+<h1 align="center">ZEDX</h1>
+<p align="center">A Fintech Productivity Mobile Application</p>
 
 ![Platform](https://img.shields.io/badge/platform-Mobile-important)
 ![Tech](https://img.shields.io/badge/Expo-React%20Native-black)
@@ -30,7 +35,6 @@ This repository contains the frontend of the ZEDX application, built using Expo 
 - ![Redux](https://img.shields.io/badge/redux-%23593d88.svg?style=for-the-badge&logo=redux&logoColor=white)
 - ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) 
 - ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-- ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
 
 ## Architecture
@@ -39,6 +43,29 @@ This repository contains the frontend of the ZEDX application, built using Expo 
 - Communicates with backend via REST APIs
 - Designed for scalability and future feature expansion
 
+## Screenshots
+
+> Screenshots are stored in `app-files/`.
+
+### Landing / Auth
+| Landing | Login | Register | Verify OTP |
+|---|---|---|---|
+| ![Landing](./app-files/landing.png) | ![Login](./app-files/Login.png) | ![Register](./app-files/Register.png)
+
+### Home / Core
+| Home | Cards | Card Benefits | Rewards |
+|---|---|---|---|
+| ![Home](./app-files/Home.png) | ![Cards](./app-files/Cards.png) | ![Card Benefits](./app-files/Card%20Benifits.png) | ![Rewards](./app-files/Rewards.png) |
+
+### Banking / Payments
+| Add Bank Account | Plaid Connect | Plaid User Login | Payment Reminders |
+|---|---|---|---|
+| ![Add Bank account](./app-files/Add%20Bank%20account.png) | ![Plaid Connect](./app-files/Plaid%20Connect.png) | ![Plaid User Login](./app-files/Plaid%20User%20Login.png) | ![Payment Reminders](./app-files/Payment%20Remainders.png) |
+
+### Insights / Profile / Errors
+| Credit Score | Spending Analysis | Profile | Error Handling |
+|---|---|---|---|
+| ![Credit Score](./app-files/Credit%20Score.png) | ![Spending Analysis](./app-files/spending%20Analysis.png) | ![Profile](./app-files/Profile.png) | ![Error Handling](./app-files/Error%20Handing.png) |
 
 ## Installation
 
@@ -78,10 +105,7 @@ Run using:
 - All data is fetched securely from backend services
 
 
-## Screenshots
 
-
-(Place for images)
 
 
 ## Support Us
