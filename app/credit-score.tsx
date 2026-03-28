@@ -1,29 +1,33 @@
 import { useAuth } from '@/hooks/useAuthStore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { CreditCard, Star, TrendingUp } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
-    Animated,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Animated,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-//const { width } = Dimensions.get('window');
-
 export default function CreditScoreScreen() {
   const router = useRouter();
-  const { tempUserData, saveUser } = useAuth();
-  const [displayScore, setDisplayScore] = useState(0);
+  const { user } = useAuth();
+
+  const [displayScore, setDisplayScore] = useState(user?.credit_score || 650);
   const animatedValue = React.useRef(new Animated.Value(0)).current;
   const scaleAnim = React.useRef(new Animated.Value(0.5)).current;
 
-  const creditScore = tempUserData.creditScore || 750;
+  const creditScore = user?.credit_score || 650;
 
+  // If no user exists (rare), redirect to login
+  useEffect(() => {
+    if (!user) router.replace('/login');
+  });
+
+  // animate the credit score reveal
   useEffect(() => {
     Animated.parallel([
       Animated.timing(animatedValue, {
@@ -48,9 +52,11 @@ export default function CreditScoreScreen() {
     };
   }, [creditScore, animatedValue, scaleAnim]);
 
+  if (!user) return null; // safety fallback
+
   const getCreditRating = (score: number) => {
     if (score >= 800) return { rating: 'Excellent', color: '#4CAF50' };
-    if (score >= 740) return { rating: 'Very Good', color: '#8BC34A' };
+    if (score >= 720) return { rating: 'Very Good', color: '#8BC34A' };
     if (score >= 670) return { rating: 'Good', color: '#FFC107' };
     if (score >= 580) return { rating: 'Fair', color: '#FF9800' };
     return { rating: 'Poor', color: '#F44336' };
@@ -58,37 +64,7 @@ export default function CreditScoreScreen() {
 
   const { rating, color } = getCreditRating(creditScore);
 
-  const handleContinue = async () => {
-    const fullUserData = {
-      firstName: tempUserData.firstName || '',
-      lastName: tempUserData.lastName || '',
-      email: tempUserData.email || '',
-      ssn: tempUserData.ssn || '',
-      creditScore: creditScore,
-      isVerified: true,
-      agreedToTerms: true,
-    };
-
-    // Save user to the main user storage
-    await saveUser(fullUserData);
-    
-    // Also save to allUsers list for login functionality
-    try {
-      const allUsers = await AsyncStorage.getItem('allUsers');
-      const users = allUsers ? JSON.parse(allUsers) : [];
-      const existingUserIndex = users.findIndex((u: any) => u.email === fullUserData.email);
-      
-      if (existingUserIndex >= 0) {
-        users[existingUserIndex] = fullUserData;
-      } else {
-        users.push(fullUserData);
-      }
-      
-      await AsyncStorage.setItem('allUsers', JSON.stringify(users));
-    } catch (error) {
-      console.error('Error saving to allUsers:', error);
-    }
-    
+  const handleContinue = () => {
     router.push('/add-card');
   };
 
@@ -100,7 +76,7 @@ export default function CreditScoreScreen() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.welcomeText}>Welcome, {tempUserData.firstName}!</Text>
+            <Text style={styles.welcomeText}>Welcome, {user.first_name}!</Text>
             <Text style={styles.title}>Your Credit Score</Text>
           </View>
 
@@ -134,7 +110,7 @@ export default function CreditScoreScreen() {
               <View style={styles.benefitContent}>
                 <Text style={styles.benefitTitle}>Premium Cards</Text>
                 <Text style={styles.benefitDescription}>
-                  Access to exclusive credit cards with better rewards
+                  Access exclusive cards with higher rewards
                 </Text>
               </View>
             </View>
@@ -158,7 +134,7 @@ export default function CreditScoreScreen() {
               <View style={styles.benefitContent}>
                 <Text style={styles.benefitTitle}>Exclusive Rewards</Text>
                 <Text style={styles.benefitDescription}>
-                  Earn up to 5% cashback on select categories
+                  Earn cashback on select categories
                 </Text>
               </View>
             </View>
@@ -167,7 +143,7 @@ export default function CreditScoreScreen() {
           <TouchableOpacity
             style={styles.continueButton}
             onPress={handleContinue}
-            activeOpacity={0.8}
+            activeOpacity={0.85}
           >
             <LinearGradient
               colors={['#4CAF50', '#45a049']}
@@ -185,35 +161,14 @@ export default function CreditScoreScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  welcomeText: {
-    fontSize: 18,
-    color: '#888',
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800' as const,
-    color: '#FFFFFF',
-  },
-  scoreContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
+  container: { flex: 1 },
+  safeArea: { flex: 1 },
+  content: { flex: 1, paddingHorizontal: 20 },
+  header: { alignItems: 'center', marginTop: 20, marginBottom: 30 },
+  welcomeText: { fontSize: 18, color: '#888', marginBottom: 8 },
+  title: { fontSize: 32, fontWeight: '800', color: '#FFFFFF' },
+
+  scoreContainer: { alignItems: 'center', marginBottom: 40 },
   scoreCircle: {
     width: 220,
     height: 220,
@@ -226,16 +181,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
   },
-  scoreNumber: {
-    fontSize: 72,
-    fontWeight: '900' as const,
-    color: '#FFFFFF',
-  },
-  scoreMax: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: -5,
-  },
+  scoreNumber: { fontSize: 72, fontWeight: '900', color: '#FFFFFF' },
+  scoreMax: { fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: -5 },
+
   ratingBadge: {
     position: 'absolute',
     bottom: 20,
@@ -245,23 +193,18 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: 14,
-    fontWeight: '700' as const,
+    fontWeight: '700',
     color: '#FFFFFF',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  benefitsContainer: {
-    marginBottom: 30,
-  },
-  benefitsTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: '#FFFFFF',
-    marginBottom: 16,
-  },
+
+  benefitsContainer: { marginBottom: 30 },
+  benefitsTitle: { fontSize: 20, fontWeight: '700', color: '#FFFFFF', marginBottom: 16 },
+
   benefitCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -271,25 +214,15 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
   },
-  benefitContent: {
-    flex: 1,
-  },
-  benefitTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  benefitDescription: {
-    fontSize: 13,
-    color: '#888',
-    lineHeight: 18,
-  },
+  benefitContent: { flex: 1 },
+  benefitTitle: { fontSize: 16, fontWeight: '600', color: '#FFFFFF', marginBottom: 4 },
+  benefitDescription: { fontSize: 13, color: '#888', lineHeight: 18 },
+
   continueButton: {
     height: 56,
     borderRadius: 28,
@@ -301,9 +234,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  continueButtonText: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#FFFFFF',
-  },
+  continueButtonText: { fontSize: 18, fontWeight: '700', color: '#FFFFFF' },
 });

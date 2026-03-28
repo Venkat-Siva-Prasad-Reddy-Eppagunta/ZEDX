@@ -1,46 +1,4 @@
-import { CreditCard, Payment, PaymentSource, Reward } from '@/types/card';
-
-export const mockCards: CreditCard[] = [
-  {
-    id: '1',
-    bankName: 'Chase Sapphire',
-    cardNumber: '4532',
-    cardHolder: 'Venkat Reddy',
-    dueDate: '2026-01-25',
-    outstandingAmount: 2845.50,
-    minimumDue: 142.25,
-    creditLimit: 15000,
-    availableCredit: 12154.50,
-    color: 'chase',
-    cardType: 'Visa',
-  },
-  {
-    id: '2',
-    bankName: 'American Express',
-    cardNumber: '8976',
-    cardHolder: 'Venkata Eppagunta',
-    dueDate: '2026-01-28',
-    outstandingAmount: 1250.00,
-    minimumDue: 62.50,
-    creditLimit: 10000,
-    availableCredit: 8750.00,
-    color: 'amex',
-    cardType: 'AmericanExpress',
-  },
-  {
-    id: '3',
-    bankName: 'Citi Double Cash',
-    cardNumber: '3421',
-    cardHolder: 'Venkata Eppagunta',
-    dueDate: '2026-02-05',
-    outstandingAmount: 4890.00,
-    minimumDue: 244.50,
-    creditLimit: 20000,
-    availableCredit: 15110.00,
-    color: 'citi',
-    cardType: 'Mastercard',
-  },
-];
+import { Payment, Reward } from '@/types/card';
 
 export const mockPayments: Payment[] = [
   {
@@ -51,7 +9,7 @@ export const mockPayments: Payment[] = [
     status: 'completed',
     cashback: 25,
   },
-  {
+    {
     id: '2',
     cardId: '2',
     amount: 1200,
@@ -79,7 +37,7 @@ export const mockRewards: Reward[] = [
     claimed: false,
     expiryDate: '2025-03-31',
   },
-  {
+    {
     id: '2',
     title: 'Streak Bonus',
     description: '5 consecutive on-time payments',
@@ -96,23 +54,5 @@ export const mockRewards: Reward[] = [
     icon: '⚡',
     claimed: true,
     expiryDate: '2025-01-31',
-  },
-];
-
-export const mockPaymentSources: PaymentSource[] = [
-  {
-    id: '1',
-    type: 'debit_card',
-    name: 'Personal Debit',
-    last4: '1234',
-    bankName: 'Bank of America',
-  },
-  {
-    id: '2',
-    type: 'bank_account',
-    name: 'Checking Account',
-    last4: '5678',
-    bankName: 'Wells Fargo',
-    accountType: 'Checking',
   },
 ];

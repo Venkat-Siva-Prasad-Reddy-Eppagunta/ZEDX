@@ -3,13 +3,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 
 export interface User {
-  firstName: string;
-  lastName: string;
+  id?: number;
+  first_name: string;
+  last_name: string;
   email: string;
-  ssn: string;
-  creditScore: number;
-  isVerified: boolean;
+  password?: string;
+  credit_score?: number;
+  cards?: any[];
+  is_verified: boolean;
   agreedToTerms: boolean;
+  token?: string;
 }
 
 export const [AuthProvider, useAuth] = createContextHook(() => {
@@ -23,12 +26,10 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const loadUser = async () => {
     try {
-      const userData = await AsyncStorage.getItem('user');
-      if (userData) {
-        setUser(JSON.parse(userData));
-      }
-    } catch (error) {
-      console.error('Error loading user:', error);
+      const stored = await AsyncStorage.getItem('user');
+      if (stored) setUser(JSON.parse(stored));
+    } catch (err) {
+      console.error('Error loading user', err);
     } finally {
       setIsLoading(false);
     }
@@ -38,8 +39,16 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     try {
       await AsyncStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
-    } catch (error) {
-      console.error('Error saving user:', error);
+      setTempUserData({});
+    } catch (err) {
+      console.error('Error saving user', err);
+    }
+  };
+
+  const setUserVerified = async (isVerified: boolean) => {
+    if (user) {
+      const updatedUser = { ...user, is_verified: isVerified };
+      await saveUser(updatedUser);
     }
   };
 
@@ -47,17 +56,21 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     setTempUserData(prev => ({ ...prev, ...data }));
   };
 
-  const clearTempUserData = () => {
-    setTempUserData({});
-  }; // remove after testing ==> Testing purpose only
+  const clearTempUserData = () => setTempUserData({});
 
-  const logout = async () => {
+  const logout = async (onLogout?: () => void) => {
     try {
       await AsyncStorage.removeItem('user');
       setUser(null);
       setTempUserData({});
-    } catch (error) {
-      console.error('Error logging out:', error);
+      await AsyncStorage.removeItem('cards'); // Clear cards on logout
+      await AsyncStorage.removeItem('payments'); // Clear payments on logout
+      await AsyncStorage.removeItem('rewards'); // Clear rewards on logout
+      await AsyncStorage.removeItem('fundingSources'); // Clear funding sources on logout
+
+      if (onLogout) onLogout(); // Call the callback to clear cards
+    } catch (err) {
+      console.error('Error logging out', err);
     }
   };
 
@@ -66,8 +79,9 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     isLoading,
     tempUserData,
     saveUser,
+    setUserVerified,
     updateTempUserData,
-    clearTempUserData, // remove after testing ==> Testing purpose only
+    clearTempUserData,
     logout,
   };
 });

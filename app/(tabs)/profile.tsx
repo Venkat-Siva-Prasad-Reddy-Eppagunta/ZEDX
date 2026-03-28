@@ -3,24 +3,24 @@ import { useAuth } from '@/hooks/useAuthStore';
 import { useCards } from '@/hooks/useCardsStore';
 import { useRouter } from 'expo-router';
 import {
-    Award,
-    Bell,
-    ChevronRight,
-    CreditCard,
-    HelpCircle,
-    LogOut,
-    Shield,
-    TrendingUp,
-    User
+  Award,
+  Bell,
+  ChevronRight,
+  CreditCard,
+  HelpCircle,
+  LogOut,
+  Shield,
+  TrendingUp,
+  User
 } from 'lucide-react-native';
 import React from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function ProfileScreen() {
@@ -70,11 +70,11 @@ export default function ProfileScreen() {
           <View style={styles.avatar}>
             <User size={40} color={theme.colors.text} />
           </View>
-          <Text style={styles.userName}>{user?.firstName} {user?.lastName}</Text>
+          <Text style={styles.userName}>{user?.first_name} {user?.last_name}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
           <View style={styles.creditScoreBadge}>
             <Text style={styles.creditScoreLabel}>Credit Score</Text>
-            <Text style={styles.creditScoreValue}>{user?.creditScore || 0}</Text>
+            <Text style={styles.creditScoreValue}>{user?.credit_score || 720}</Text>
           </View>
         </View>
 
